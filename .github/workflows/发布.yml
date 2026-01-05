@@ -1,0 +1,13 @@
+# 发布 CI/CD 发布模式，本地发布和线上发布均无法正常发布，只能这样了
+
+name: 发布到 vs code  extension
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      matrix: os

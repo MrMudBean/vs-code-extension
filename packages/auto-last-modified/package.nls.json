@@ -1,0 +1,20 @@
+{
+  "plugin.displayName": "auto last modified",
+  "plugin.description": "Automatically update specific fields in the header comments of mdx/md/js/ts/jsx/tsx files so that you don't have to manually maintain the update date. Of course, you can also automatically generate header comments.",
+  "command.resetExtensionData": "Auto Last Modified: Re-fetch extended data (for example, get the Git email when the email is not set)",
+  "command.createJavaScriptHeaderComment": "Auto Last Modified: Create JS/TS/JSX/TSX type file header comment",
+  "command.createMdxHeaderComment": "Auto Last Modified: Create MDX type file header comment",
+  "command.createMdxPageHeaderComment": "Auto Last Modified: Create MDX type file (page mode) header comment",
+  "command.createMdxBlogHeaderComment": "Auto Last Modified: Create Markdown/MDX type file (blog mode) Header",
+  "configuration.authorName": "Your name; if not provided, it will try to read the username from the git global configuration using `git config --global user.name` 📇",
+  "configuration.authorEmail": "If your email is not provided, it will be read from the global Git configuration set with `git config --global user.email` 📮",
+  "configuration.updatedTag": "Automatically update the tag in the file header comments. If not specified, it defaults to 'updated', for example: 'updated' ➞ @updated. However, for MDX/markdown, the default is 'last_update', and modifying it is not currently supported ([Docusaurus mode](https://docusaurus.io/docs/api/plugins)).",
+  "configuration.autoInsertOnNewFile": "Whether to automatically insert a file header in newly created supported files",
+  "configuration.dateFormat": "Date format (e.g.: YYYY-MM-DD)",
+  "configuration.mdxHeaderTypePageDesc": "ues [docusaurus page](https://docusaurus.io//docs/api/plugins/@docusaurus/plugin-content-docs) mode",
+  "configuration.mdxHeaderTypeBlogDesc": "use [docusaurus blog](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-blog) mode",
+  "configuration.mdxHeaderTypeDesc": "Pattern used when generating markdown/mdx [docusaurus](https://docusaurus.io/docs/api/plugins) file headers",
+  "configuration.mdxHeaderTypePageLabel": "page mode",
+  "configuration.mdxHeaderTypeBlogLabel": "blog mode",
+  "configuration.objectDesc": "A configuration object that will be set to configure specific file headers for a particular language (future feature, this value is not currently used and will be ignored if set)."
+}

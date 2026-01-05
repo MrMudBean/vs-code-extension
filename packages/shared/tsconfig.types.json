@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src/",
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationDir": "dist/"
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "rollup.config.js"
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "name": "auto-last-modified",
+  "publisher": "MrMudBean",
+  "displayName": "%plugin.displayName%",
+  "description": "%plugin.description%",
+  "type": "commonjs",
+  "version": "0.1.0",
+  "galleryBanner": {
+    "color": "#36ff69",
+    "theme": "light"
+  },
+  "icon": "images/logo.png",
+  "author": {
+    "name": "Mr.MudBean",
+    "email": "Mr.MudBean@outlook.com"
+  },
+  "badges": [
+    {
+      "url": "https://img.shields.io/github/license/MrMudBean/vs-code-extension?style=flat-square",
+      "href": "https://github.com/MrMudBean/vs-code-extension/blob/main/packages/auto-last-modified/LICENSE",
+      "description": "LICENSE"
+    }
+  ],
+  "pricing": "Free",
+  "preview": true,
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "auto last modified",
+    "auto file header comment",
+    "自动更新最后编辑日期",
+    "自动文件头"
+  ],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact",
+    "onLanguage:mdx",
+    "onLanguage:markdown",
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "autoLastModified.resetExtensionData",
+        "title": "%command.resetExtensionData%"
+      },
+      {
+        "command": "autoLastModified.createJavaScriptHeaderComment",
+        "title": "%command.createJavaScriptHeaderComment%"
+      },
+      {
+        "command": "autoLastModified.createMdxHeaderComment",
+        "title": "%command.createMdxHeaderComment%"
+      },
+      {
+        "command": "autoLastModified.createMdxPageHeaderComment",
+        "title": "%command.createMdxPageHeaderComment%"
+      },
+      {
+        "command": "autoLastModified.createMdxBlogHeaderComment",
+        "title": "%command.createMdxBlogHeaderComment%"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "autoLastModified.createJavaScriptHeaderComment",
+          "group": "1_modification@8",
+          "when": "resourceFilename =~ /\\.(js|ts|jsx|tsx)$/ && autoLastModified.editorIsEmptyDoc"
+        },
+        {
+          "command": "autoLastModified.createMdxHeaderComment",
+          "group": "1_modification@8",
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+        },
+        {
+          "command": "autoLastModified.createMdxPageHeaderComment",
+          "group": "1_modification@9",
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+        },
+        {
+          "command": "autoLastModified.createMdxBlogHeaderComment",
+          "group": "1_modification@10",
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "autoLastModified.createJavaScriptHeaderComment",
+          "when": "resourceFilename =~ /\\.(js|ts|jsx|tsx)$/ && autoLastModified.editorIsEmptyDoc"
+        },
+        {
+          "command": "autoLastModified.createMdxHeaderComment",
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+        },
+        {
+          "command": "autoLastModified.createMdxPageHeaderComment",
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+        },
+        {
+          "command": "autoLastModified.createMdxBlogHeaderComment",
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+        }
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Auto Last Modified",
+      "properties": {
+        "autoLastModified.authorName": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "%configuration.authorName%"
+        },
+        "autoLastModified.authorEmail": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "%configuration.authorEmail%"
+        },
+        "autoLastModified.updatedTag": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "%configuration.updatedTag%"
+        },
+        "autoLastModified.autoInsertOnNewFile": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.autoInsertOnNewFile%"
+        },
+        "autoLastModified.dateFormat": {
+          "type": "string",
+          "default": "YYYY-MM-DD",
+          "description": "%configuration.dateFormat%"
+        },
+        "autoLastModified.mdxHeaderType": {
+          "type": "string",
+          "enum": [
+            "page",
+            "blog"
+          ],
+          "markdownEnumDescriptions": [
+            "%configuration.mdxHeaderTypePageDesc%",
+            "%configuration.mdxHeaderTypeBlogDesc%"
+          ],
+          "enumItemLabels": [
+            "%configuration.mdxHeaderTypePageLabel%",
+            "%configuration.mdxHeaderTypeBlogLabel%"
+          ],
+          "default": "page",
+          "markdownDescription": "%configuration.mdxHeaderTypeDesc%"
+        },
+        "autoLastModified.object": {
+          "type": "object",
+          "properties": {
+            "ts": {
+              "type": "string"
+            }
+          },
+          "description": "%configuration.objectDesc%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run package",
+    "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "pnpm run check-types && pnpm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --fix",
+    "publish": "vsce publish",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "zza": "workspace:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrMudBean/vs-code-extension.git",
+    "directory": "packages/auto-last-modified"
+  },
+  "bugs": {
+    "url": "https://github.com/MrMudBean/vs-code-extension/issues",
+    "email": "Mr.MudBean@outlook.com"
+  },
+  "homepage": "https://lmssee.com/vs-code-extension/auto-last-modified"
+}
