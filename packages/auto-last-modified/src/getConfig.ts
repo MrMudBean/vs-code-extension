@@ -42,7 +42,7 @@ export function currentDate() {
   const date_format = dateFormat(); // 用户输入的格式
   const now_time = new Date();
   const now_year = now_time.getFullYear().toString();
-  const now_month = now_time.getMonth().toString().padStart(2, '0');
+  const now_month = (now_time.getMonth() + 1).toString().padStart(2, '0');
   const now_date = now_time.getDate().toString().padStart(2, '0');
 
   return date_format

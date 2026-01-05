@@ -4,7 +4,7 @@
   "displayName": "%plugin.displayName%",
   "description": "%plugin.description%",
   "type": "commonjs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "galleryBanner": {
     "color": "#36ff69",
     "theme": "light"
@@ -22,7 +22,7 @@
     }
   ],
   "pricing": "Free",
-  "preview": true,
+  "preview": false,
   "license": "MIT",
   "engines": {
     "vscode": "^1.90.0"
@@ -170,6 +170,7 @@
     }
   },
   "scripts": {
+    "vjj": "vjj ---no-diff",
     "vscode:prepublish": "pnpm run package",
     "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
