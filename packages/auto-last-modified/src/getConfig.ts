@@ -1,5 +1,26 @@
 import * as vscode from 'vscode';
 
+/** 被提取的校验数组 */
+const checkDataFormatArr: ['YYYY', 'MM', 'DD'] = ['YYYY', 'MM', 'DD'],
+  /** 校验日期的时分秒的数组 */
+  checkDataFormatTimeArr: ['hh', 'mm', 'ss'] = ['hh', 'mm', 'ss'],
+  /** 默认的日期格式 */
+  defaultDatFormat: 'YYYY-MM-DD' = 'YYYY-MM-DD',
+  emptyArr: [] = [];
+
+Object.freeze(emptyArr);
+
+export { emptyArr, defaultDatFormat };
+
+/**
+ *
+ * @param date 要处理的时间
+ * @returns 除了后格式化的时间
+ */
+function formatDate(date: number): string {
+  return date.toString().padStart(2, '0');
+}
+
 /**
  * ## 获取用户配置文件
  * @returns 用户的配置文件
@@ -7,59 +28,78 @@ import * as vscode from 'vscode';
 export function getConfig(): vscode.WorkspaceConfiguration {
   return vscode.workspace.getConfiguration('autoLastModified');
 }
+/**
+ *
+ * @param name 获取的键
+ * @param defaultValue 默认值
+ * @returns 返回获取的值
+ */
+function _get<T>(name: string, defaultValue: T) {
+  return getConfig().get<T>(name, defaultValue) || defaultValue;
+}
 
 /**
  * ## 获取设定的用户名
  * @returns 获取设定的用户名
  */
-export const authorName = () => getConfig().get<string>('authorName', '');
+export const authorName = () => _get<string>('authorName', '');
 
 /**
  * ## 获取用户设定的邮箱
  * @returns 获取到的用户邮箱
  */
-export const authorEmail = () => getConfig().get<string>('authorEmail', '');
+export const authorEmail = () => _get<string>('authorEmail', '');
 
 /**
  * ## 获取用户设定自动插入空文档
  * @returns 用户设定自动插入状态
  */
-export const autoInsert = () =>
-  getConfig().get<boolean>('autoInsertOnNewFile', true);
+export const autoInsert = () => _get<boolean>('autoInsertOnNewFile', true);
 
 /**
  * ## 用户设定的日期格式
  * @returns 用户设定的日期格式
  */
-export const dateFormat = () =>
-  getConfig().get<string>('dateFormat', 'YYYY-MM-DD');
-
-/**
- * 格式化后的当前日期
- * @returns 当前的日期
- */
-export function currentDate() {
-  const date_format = dateFormat(); // 用户输入的格式
-  const now_time = new Date();
-  const now_year = now_time.getFullYear().toString();
-  const now_month = (now_time.getMonth() + 1).toString().padStart(2, '0');
-  const now_date = now_time.getDate().toString().padStart(2, '0');
-
-  return date_format
-    .replace(/YYYY/, now_year)
-    .replace(/MM/, now_month)
-    .replace(/DD/, now_date);
-}
+export const dateFormat = () => _get<string>('dateFormat', defaultDatFormat);
 
 /**
  * 更新日期的字段（使用还需要结合 isMdx ）
  * @returns 更新设定标签
  */
-export const updatedTag = () =>
-  getConfig().get<string>('updatedTag', 'updated') || 'updated';
+export const lastModifiedTag = () =>
+  _get<string>('lastModifiedTag', 'lastModified');
 
+/**
+ *
+ * @returns 获取到的 markdown 类型文件的默认构建类型
+ */
 export const mdxHeaderType = () =>
-  getConfig().get<'page' | 'blog'>('mdxHeaderType', 'page') || 'page';
+  _get<'page' | 'blog'>('mdxHeaderType', 'page');
+
+/**
+ *
+ * @returns 使用 js/ts/jsx/tsx 的普通模式路径
+ */
+export const useJsPlainStyle = () =>
+  _get<string[]>('useJsPlainStyle', emptyArr);
+
+/**
+ *
+ * @returns 使用 js/ts/jsx/tsx 的包文档模式路径
+ */
+export const usePackageDocumentationStyle = () =>
+  _get<string[]>('usePackageDocumentationStyle', emptyArr);
+/**
+ *
+ * @returns 使用 md/mdx 的 doc 模式
+ */
+export const useMdDocStyle = () => _get<string[]>('useMdDocStyle', emptyArr);
+
+/**
+ *
+ * @returns 使用 md/mdx 的 blog 模式
+ */
+export const useMdBlogStyle = () => _get<string[]>('useMdBlogStyle', emptyArr);
 
 /**
  * 配置值
@@ -76,7 +116,47 @@ export const vsCodeConfig = {
   /** 格式化后的当前日期 */
   currentDate,
   /** 更新日期的字段（使用还需结合 isMdx ） */
-  updatedTag,
+  lastModifiedTag,
   /** 默认构建的 Mdx 的文件头类型 */
   mdxHeaderType,
+  /**  使用 js/ts/jsx/tsx 的普通模式路径 */
+  useJsPlainStyle,
+  /** 使用 js/ts/jsx/tsx 的包文档模式路径  */
+  usePackageDocumentationStyle,
+  /**  */
+  useMdDocStyle,
 };
+
+/**
+ * 格式化后的当前日期
+ * @returns 当前的日期
+ */
+export function currentDate() {
+  let date_format = dateFormat(); // 用户输入的格式
+  date_format = checkDataFormatArr.some(e => !date_format.includes(e))
+    ? defaultDatFormat
+    : date_format;
+  const now_time = new Date();
+  const now_year = now_time.getFullYear().toString();
+  const now_month = formatDate(now_time.getMonth() + 1);
+  const now_date = formatDate(now_time.getDate());
+  const now_hours = formatDate(now_time.getHours());
+  const now_minutes = formatDate(now_time.getMinutes());
+  const now_seconds = formatDate(now_time.getSeconds());
+
+  // 若用户主动设置了 “时、分、秒”，将转化为实际的值
+  if (checkDataFormatTimeArr.some(e => date_format.includes(e))) {
+    return date_format
+      .replace(/YYYY/, now_year)
+      .replace(/MM/, now_month)
+      .replace(/DD/, now_date)
+      .replace(/hh/, now_hours)
+      .replace(/mm/, now_minutes)
+      .replace(/ss/, now_seconds);
+  } else {
+    return date_format
+      .replace(/YYYY/, now_year)
+      .replace(/MM/, now_month)
+      .replace(/DD/, now_date);
+  }
+}

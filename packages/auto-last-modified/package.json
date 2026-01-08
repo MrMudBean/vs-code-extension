@@ -4,10 +4,10 @@
   "displayName": "%plugin.displayName%",
   "description": "%plugin.description%",
   "type": "commonjs",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "galleryBanner": {
-    "color": "#36ff69",
-    "theme": "light"
+    "color": "#00af8e",
+    "theme": "dark"
   },
   "icon": "images/logo.png",
   "author": {
@@ -125,20 +125,40 @@
           "default": "",
           "markdownDescription": "%configuration.authorEmail%"
         },
-        "autoLastModified.updatedTag": {
+        "autoLastModified.lastModifiedTag": {
           "type": "string",
           "default": "",
-          "markdownDescription": "%configuration.updatedTag%"
+          "markdownDescription": "%configuration.lastModifiedTag%"
         },
         "autoLastModified.autoInsertOnNewFile": {
           "type": "boolean",
           "default": true,
-          "description": "%configuration.autoInsertOnNewFile%"
+          "markdownDescription": "%configuration.autoInsertOnNewFile%"
         },
         "autoLastModified.dateFormat": {
           "type": "string",
           "default": "YYYY-MM-DD",
-          "description": "%configuration.dateFormat%"
+          "markdownDescription": "%configuration.dateFormat%"
+        },
+        "autoLastModified.useJsPlainStyle": {
+          "type": "array",
+          "default": [],
+          "markdownDescription": "%configuration.useJsPlainStyle%"
+        },
+        "autoLastModified.usePackageDocumentationStyle": {
+          "type": "array",
+          "default": [],
+          "markdownDescription": "%autoLastModified.usePackageDocumentationStyle%"
+        },
+        "autoLastModified.useMdDocStyle": {
+          "type": "array",
+          "default": [],
+          "markdownDescription": "%utoLastModified.useMdDocStyle%"
+        },
+        "autoLastModified.useMdBlogStyle": {
+          "type": "array",
+          "default": [],
+          "markdownDescription": "%autoLastModified.useMdBlogStyle%"
         },
         "autoLastModified.mdxHeaderType": {
           "type": "string",
@@ -164,7 +184,8 @@
               "type": "string"
             }
           },
-          "description": "%configuration.objectDesc%"
+          "markdownDescription": "%configuration.objectDesc%",
+          "deprecationMessage": "%plugin.deprecationMessage%"
         }
       }
     }
