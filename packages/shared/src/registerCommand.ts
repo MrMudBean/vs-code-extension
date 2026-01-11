@@ -1,5 +1,6 @@
 import { colorText, magentaPen, randomPen, yellowPen } from 'color-pen';
 import * as vscode from 'vscode';
+import { print } from './print';
 
 /**
  * ## 注册可执行命令
@@ -24,8 +25,9 @@ export function registerCommand<T extends string>({
 }): vscode.Disposable {
   console.log(
     ...colorText(
-      `${magentaPen`扩展 Super File Header 命令 ${randomPen(name)}`}${yellowPen`注册成功 ！！`}`,
+      `${magentaPen`扩展注册命令 ${randomPen(name)}`}${yellowPen`成功 ！！`}`,
     ),
   );
+  print(`扩展注册命令 ${name} 成功 ✅ ！！`);
   return vscode.commands.registerCommand(name, callback);
 }

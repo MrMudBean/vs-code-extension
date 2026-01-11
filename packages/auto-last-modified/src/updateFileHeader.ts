@@ -1,11 +1,5 @@
-import {
-  bgBrightBlackPen,
-  bluePen,
-  brightGreenPen,
-  colorText,
-  randomPen,
-  yellowPen,
-} from 'color-pen';
+import path from 'node:path';
+import { isBusinessEmptyString } from 'a-type-of-js';
 import * as vscode from 'vscode';
 import { print } from 'zza';
 import { getAuthorInfo } from './authorInfo';
@@ -37,9 +31,30 @@ export async function updateFileHeader() {
   // 查找注释位置
   const [startLine, endLine] = checkHasHeaderComment(mdxDoc);
   if (startLine > endLine) return; // 不满足条件
+  const edit = new vscode.WorkspaceEdit();
+  editLastModified(startLine, endLine, edit);
+  if (mdxDoc) {
+    editAuthor(startLine, endLine, edit);
+  }
+  if (isJs()) {
+    editFileName(startLine, endLine, edit);
+  }
+  await vscode.workspace.applyEdit(edit);
+}
 
+/**
+ *
+ * @param startLine 开始行数
+ * @param endLine 结束行数
+ * @param edit 文本编辑
+ */
+function editLastModified(
+  startLine: number,
+  endLine: number,
+  edit: vscode.WorkspaceEdit,
+) {
+  const mdxDoc = isMarkdown() || isMdx();
   const tagName = vsCodeConfig.lastModifiedTag();
-
   // 构建正则：匹配 @lastModified: ... 或 @lastModified ...
   const dateRegex = new RegExp(
     mdxDoc
@@ -47,93 +62,112 @@ export async function updateFileHeader() {
       : `^(\\s*\\*\\s*@${tagName}\\s*[:：]?\\s*)(.*)$`,
     'i',
   );
-  // 匹配 ` author: `
-  const authorRegexp = new RegExp('^(\\s+author\\s*[:：]?\\s*)(.*)$', 'i');
-
-  let findDate = false,
-    findAuthor = false;
 
   // 在注释块中查找 @lastModified 行
   for (let i = startLine; i <= endLine; i++) {
-    const line = currentDocument.lineAt(i); // 行数据
-    // eslint-disable-next-line jsdoc/check-tag-names
-    /**  @ts-ignore: 兼容 mdx 文件  */
-    const matchDate = line[mdxDoc ? 'b' : 'text'].match(dateRegex); // 获取旧日期
-    if (matchDate) {
-      findDate = true;
-      const oldValue = matchDate[2].trim(); // 旧的日期
-      const newValue = currentDate(); // 新的当前日期
-      // 如果日期没变，跳过
-      if (oldValue === newValue) {
-        if (mdxDoc && !findAuthor) {
-          continue;
-        } else {
-          break;
-        }
-      }
-      let prefix: string = matchDate[1]; // 构造新行
-      prefix = prefix.replace(/(\S)$/, '$1 '); // 没有空格就追加空格
-      await updateLine(line, `${prefix}${newValue}`);
-      print(
-        ...colorText(
-          `更新 ${currentDocument.fileName} @${yellowPen(tagName)} 为新日期： ${randomPen(newValue)}`,
-        ),
-      );
-      if (mdxDoc && !findAuthor) {
-        continue;
-      } else {
-        break;
-      }
+    const lineText = getLineText(i); // 行文本
+    const matchDate = lineText.match(dateRegex); // 获取旧日期
+    if (!matchDate) {
+      continue;
     }
-    // eslint-disable-next-line jsdoc/check-tag-names
-    /**  @ts-ignore: 故意的  */
-    const matchAuthor = line[mdxDoc ? 'b' : 'text'].match(authorRegexp);
-    if (matchAuthor) {
-      findAuthor = true;
-      const oldAuthor = matchAuthor[2].trim(); // 旧人
-      const newAuthor = getAuthorInfo().name.trim(); // 新人
-      if (oldAuthor === newAuthor) {
-        if (mdxDoc && !findDate) {
-          continue;
-        } else {
-          break;
-        }
-      }
-      let prefix: string = matchAuthor[1];
-      prefix = prefix.replace(/(\S)$/, '$1 ');
-      await updateLine(line, `${prefix}${newAuthor}`);
-      print(
-        ...colorText(
-          `更新最后更新用户 ${bgBrightBlackPen(oldAuthor)} ${bluePen`➞`} ${brightGreenPen(newAuthor)}`,
-        ),
-      );
-
-      if (mdxDoc && !findDate) {
-        continue;
-      } else {
-        break;
-      }
+    const oldValue = matchDate[2]; // 旧的日期
+    const newValue = currentDate(); // 新的当前日期
+    // 如果日期没变，跳过
+    if (oldValue === newValue) {
+      break;
     }
+    let prefix: string = getPrefix(matchDate); // 构造新行
+    updateLine(i, `${prefix}${newValue}`, edit);
+    print(`更新 @${tagName} 为新日期： ${newValue}`);
+    break;
   }
-
-  // TODO ：如果没找到 @lastModified ，可以选择插入
 }
 
 /**
- * @param originLine 原始行数据
- * @param newLineText 新行文本
+ * ## 在指定行区域内查找特定的人名并替换
+ * @param startLine 开始行
+ * @param endLine 结束的行
+ * @param edit 工作区编译器
  */
-async function updateLine(originLine: vscode.TextLine, newLineText: string) {
+function editAuthor(
+  startLine: number,
+  endLine: number,
+  edit: vscode.WorkspaceEdit,
+) {
+  // 匹配 ` author: `
+  const authorRegexp = new RegExp('^(\\s+author\\s*[:：]?\\s*)(.*)$', 'i');
+  for (let i = startLine; i <= endLine; i++) {
+    const lineText = getLineText(i);
+    const matchAuthor = lineText.match(authorRegexp);
+    if (!matchAuthor) {
+      continue;
+    }
+    const oldAuthor = matchAuthor[2]; // 旧人
+    const newAuthor = getAuthorInfo().name.trim(); // 新人
+    if (oldAuthor === newAuthor) {
+      break;
+    }
+    let prefix: string = getPrefix(matchAuthor);
+    updateLine(i, `${prefix}${newAuthor}`, edit);
+    print(`更新最后用户：${oldAuthor}  ➞  ${newAuthor}`);
+    break;
+  }
+}
+
+/**
+ *
+ * @param startLine 开始的行
+ * @param endLine 结束的行
+ * @param edit 工作区编辑器
+ */
+function editFileName(
+  startLine: number,
+  endLine: number,
+  edit: vscode.WorkspaceEdit,
+) {
+  if (!currentDocument) {
+    return;
+  }
+  const fileNameRegexp = new RegExp(
+    '^(\\s*\\*\\s*@file\\s*[:：]?\\s)(.*)$',
+    'i',
+  );
+  const filePath = currentDocument.fileName; // 文件路径
+  const fileName = path.basename(filePath); // 文件名
+  for (let i = startLine; i <= endLine; i++) {
+    const lineText = getLineText(i); // 行文本
+    const matchFileName = lineText.match(fileNameRegexp);
+    if (!matchFileName) {
+      continue;
+    }
+    const oldFileName = matchFileName[2]; // 旧的文本地址
+    if (oldFileName === fileName && !isBusinessEmptyString(fileName)) {
+      break;
+    }
+    let prefix: string = getPrefix(matchFileName);
+    updateLine(i, `${prefix}${fileName}`, edit); // 更新行
+    print(`更新文本名：${oldFileName} ➞ ${fileName}`);
+    break;
+  }
+}
+
+/**
+ * @param lineNumber 行数
+ * @param newLineText 新行文本
+ * @param edit 工作空间编辑者
+ */
+function updateLine(
+  lineNumber: number,
+  newLineText: string,
+  edit: vscode.WorkspaceEdit,
+) {
   if (!currentDocument) return;
-  // 替换该行
-  const edit = new vscode.WorkspaceEdit();
+  const originLine = currentDocument.lineAt(lineNumber);
   edit.replace(
     currentDocument.uri,
     new vscode.Range(originLine.range.start, originLine.range.end),
     newLineText,
   );
-
-  await vscode.workspace.applyEdit(edit);
 }
 
 /**
@@ -168,4 +202,29 @@ function checkHasHeaderComment(mdxDoc: boolean): [number, number] {
   }
 
   return [startLine, endLine];
+}
+
+/**
+ * ## 获取前置文本
+ * @param matchResponse 正则匹配对象
+ * @returns 返回文本
+ */
+function getPrefix(matchResponse: RegExpMatchArray): string {
+  let prefix: string = matchResponse[1] || '';
+  prefix = prefix.replace(/(\S)$/, '$1 ').replace(/\s+$/, ' ');
+  return prefix;
+}
+
+/**
+ * ## 获取行文本
+ * @param lineNumber 行数
+ * @returns 返回当前行的文本
+ */
+function getLineText(lineNumber: number): string {
+  if (!currentDocument) return '';
+  const line = currentDocument.lineAt(lineNumber);
+  // eslint-disable-next-line jsdoc/check-tag-names
+  /**  @ts-ignore: 兼容 mdx 文件  */
+  const lineText = line['text'] || line['b'];
+  return lineText;
 }

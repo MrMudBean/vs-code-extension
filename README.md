@@ -7,3 +7,7 @@
 正确的网站是 [dev.azure](https://dev.azure.com/MrMudBean/)
 
 使用 `vsce publish` 后使用 `vsce logout` 移除旧的登陆令牌
+
+## vs code 面板
+
+控制面板在 [marketplace](https://marketplace.visualstudio.com/manage/publishers/mrmudbean)

@@ -4,7 +4,7 @@
   "displayName": "%plugin.displayName%",
   "description": "%plugin.description%",
   "type": "commonjs",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "galleryBanner": {
     "color": "#00af8e",
     "theme": "dark"
@@ -74,40 +74,40 @@
         {
           "command": "autoLastModified.createJavaScriptHeaderComment",
           "group": "1_modification@8",
-          "when": "resourceFilename =~ /\\.(js|ts|jsx|tsx)$/ && autoLastModified.editorIsEmptyDoc"
+          "when": "resourceFilename =~ /\\.(js|ts|jsx|tsx)$/ && autoLastModified.showCommand"
         },
         {
           "command": "autoLastModified.createMdxHeaderComment",
           "group": "1_modification@8",
-          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.showCommand"
         },
         {
           "command": "autoLastModified.createMdxPageHeaderComment",
           "group": "1_modification@9",
-          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.showCommand"
         },
         {
           "command": "autoLastModified.createMdxBlogHeaderComment",
           "group": "1_modification@10",
-          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.showCommand"
         }
       ],
       "commandPalette": [
         {
           "command": "autoLastModified.createJavaScriptHeaderComment",
-          "when": "resourceFilename =~ /\\.(js|ts|jsx|tsx)$/ && autoLastModified.editorIsEmptyDoc"
+          "when": "resourceFilename =~ /\\.(js|ts|jsx|tsx)$/ && autoLastModified.showCommand"
         },
         {
           "command": "autoLastModified.createMdxHeaderComment",
-          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.showCommand"
         },
         {
           "command": "autoLastModified.createMdxPageHeaderComment",
-          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.showCommand"
         },
         {
           "command": "autoLastModified.createMdxBlogHeaderComment",
-          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.editorIsEmptyDoc"
+          "when": "resourceFilename =~ /\\.(md|mdx)$/ && autoLastModified.showCommand"
         }
       ]
     },
@@ -134,6 +134,16 @@
           "type": "boolean",
           "default": true,
           "markdownDescription": "%configuration.autoInsertOnNewFile%"
+        },
+        "autoLastModified.allowInsertOnEmptyFileSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.allowInsertOnEmptyFileSave%"
+        },
+        "autoLastModified.forciblyInsert": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.forciblyInsert%"
         },
         "autoLastModified.dateFormat": {
           "type": "string",
@@ -191,7 +201,9 @@
     }
   },
   "scripts": {
+    "diff": "jja pkg --diff 淘宝",
     "vjj": "vjj ---no-diff",
+    "push": "gvv",
     "vscode:prepublish": "pnpm run package",
     "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
@@ -203,8 +215,12 @@
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src --fix",
-    "publish": "vsce publish",
+    "dev": "vsce package",
+    "pub": "vsce publish",
     "test": "vscode-test"
+  },
+  "overrides": {
+    "zza": "workspace:zza"
   },
   "devDependencies": {
     "zza": "workspace:*"

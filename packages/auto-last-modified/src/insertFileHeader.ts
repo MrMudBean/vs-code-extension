@@ -1,14 +1,17 @@
-import { basename, extname, sep } from 'node:path';
+import path from 'node:path';
+import { getPackageJsonSync } from 'a-node-tools';
+import { isNull, isString } from 'a-type-of-js';
 import * as vscode from 'vscode';
-import { print, showErrorMessage } from 'zza';
+import { print, printError, printWarn, showErrorMessage } from 'zza';
 import { getAuthorInfo } from './authorInfo';
-import { changeFileIsEmpty } from './changeFileIsEmpty';
+import { checkCurrentDocumentIsEmpty } from './checkCurrentDocumentIsEmpty';
 import {
   crossPlatformPath,
   currentDocument,
   setCurrentDocument,
 } from './context';
 import {
+  allowInsertOnEmptyFileSave,
   autoInsert,
   currentDate,
   mdxHeaderType,
@@ -26,18 +29,23 @@ import { isJs, isMarkdown, isMdx } from './getLang';
  */
 export async function autoInsertFileHeader() {
   if (!currentDocument) {
+    printError('插入头前，未找到当前文档');
     return;
   }
   /** MDX 文档类型 */
-  const mdxDoc = isMdx();
+  const mdxDoc = isMdx() || isMarkdown();
   /** 有效的文档类型 */
   const isEffectiveDoc = mdxDoc || isJs();
   if (
     !autoInsert() || // 不允许自动插入（用户手动关闭了该项）
     !isEffectiveDoc || // 当前非支持文档类型
     currentDocument.getText().replace(/\s/g, '') !== '' || // 当前非新（空）文档
-    currentDocument.isDirty // 当前文档不干净
+    (!allowInsertOnEmptyFileSave() && currentDocument.isDirty) // 当前文档不干净
   ) {
+    printError('不符合要求退出插入');
+    printWarn(`是否允许指定插入： ${autoInsert()}`);
+    printWarn(`是否是有效文档: ${isEffectiveDoc}`);
+    printWarn(`当前文档是否是脏的 ${currentDocument.isDirty}`);
     // 不符合要求退出
     return;
   }
@@ -58,7 +66,7 @@ export async function autoInsertFileHeader() {
 }
 
 /**
- * ## 主动构建文件头
+ * ## 命令触发主动构建文件头
  *
  * 由于是主动，当前尽能从当前活动的上下为编辑中获取文本文档
  *
@@ -69,11 +77,14 @@ export function buildFileHeaderOnActiveTextEditor(type?: 'page' | 'blog') {
   const editor = vscode.window.activeTextEditor;
   if (!editor || !editor.document) return;
   setCurrentDocument(editor.document); // 重要：构建当前文本文档
-  buildFileHeader({ editor, type });
+  // 直接将该方法作为回调函数时，默认会给当前文档信息的值，但是并不是要的
+  buildFileHeader({ editor, type: isString(type) ? type : undefined });
 }
 
+/** 可用的文档类型 */
 type OptionType = 'plain' | 'package' | 'page' | 'blog';
 
+/** 参数 */
 type Option = {
   /** vscode 文本编辑 */
   editor: vscode.TextEditor;
@@ -90,7 +101,7 @@ type Option = {
  */
 async function buildFileHeader({ editor, type }: Option) {
   if (!currentDocument) {
-    return print('没有找到 document');
+    return printError('意外发生，构建文件头部注释时没有没有找到文本文档');
   }
 
   let template = getTemplate({ type }); // 模版片段
@@ -99,16 +110,18 @@ async function buildFileHeader({ editor, type }: Option) {
       if (!currentDocument) return;
       const fullRange = new vscode.Range(
         new vscode.Position(0, 0),
-        currentDocument.positionAt(currentDocument.getText().length),
+        new vscode.Position(0, 0),
+        // currentDocument.positionAt(currentDocument.getText().length), // 会替换整个文档，在文件不干净时
       );
       editBuilder.replace(fullRange, template); // 替换文本
     });
     await currentDocument.save(); // 保存写入
   } catch (error: any) {
     console.error('初始化空文件失败', error);
+    printError(`初始化空文件失败： ${error.message || error}`);
     showErrorMessage(`初始化空文件失败： ${error.message}`);
   }
-  changeFileIsEmpty(); // 重要：更改右键状态
+  checkCurrentDocumentIsEmpty(); // 重要：更改右键状态
 }
 
 /**
@@ -132,19 +145,20 @@ function getTemplate({
   const currentNow = currentDate(); // 当前的时间
   const isBlog = type === 'blog'; // 是否是 blog 模式
   const isPlain = type === 'plain'; // 是否是常规模式
-
+  const version = getVersion(); // 获取版本号
+  print(`当前的模式: ${type}`);
   return !isJs()
     ? [
         '---',
-        `title: ${basename(filePath, extname(filePath))}`, // 移除末尾的空格
-        isBlog && `authors: [${name}]`,
-        '# description: xx',
-        isBlog && '# keys: []',
-        'hide_title: true',
-        `date: ${currentNow}`,
-        `last_update:`,
-        ` date: ${currentNow}`,
-        ` author: ${name}`,
+        `title: ${path.basename(filePath, path.extname(filePath))}`, // 移除末尾的空格（默认插入的为文件名）
+        isBlog && `authors: [${name}]`, // 用户信息
+        'description: _', // 描述文本
+        isBlog && 'keys: []', // 在 blog 模式下显示
+        'hide_title: true', // 默认隐藏主标题
+        `date: ${currentNow}`, // 构建日期
+        `last_update:`, // 最后更新
+        ` date: ${currentNow}`, // 更新日期
+        ` author: ${name}`, // 更新用户信息
         // blog 模式不显示不支持的 pagination_prev
         !isBlog && 'pagination_prev: null',
         // blog 模式不显示不支持的 pagination_next
@@ -154,21 +168,24 @@ function getTemplate({
         // 博客模式下显示摘要内容的标记
         // 该标记在 markdown 文件个 MDX 文件中不一致
         isBlog && (isMarkdown() ? '<!-- truncate  -->' : '{/* {truncate} */}'), // 插入摘要标记
+        '', // 添加一个空行
       ]
         .filter(e => e !== false)
         .join('\n')
     : [
         '/**',
-        ` * @file ${basename(filePath)}`,
-        ' * @description xx',
-        ` * @author ${name || '📇'} <${email || '📮'}>`,
-        ' * @license MIT',
-        ` * @copyright  ${new Date().getFullYear()} ©️ ${name || '📇'}`,
-        !isPlain && ' * @packageDocumentation',
-        ' * @module  xx',
-        ` * @since ${currentNow}`,
-        ` * @lastModified ${currentNow}`,
-        ' **/',
+        !isPlain && ' * @packageDocumentation', // TS 行业规则，必须放在首行
+        ' * @module  _', // 模块
+        ` * @file ${path.basename(filePath)}`, // 文件名
+        ' * @description _', // 描述
+        ` * @author ${name || '📇'} <${email || '📮'}>`, // 账户信息
+        !isPlain && ' * @license MIT',
+        ` * @copyright  ${new Date().getFullYear()} ©️ ${name || '📇'}`, // 版权信息
+        ` * @since ${currentNow}`, // 构建时间
+        version && ` * @version ${version}`, // 版本信息
+        ` * @lastModified ${currentNow}`, // 最后编辑时间
+        ' */',
+        '',
       ]
         .filter(e => e !== false)
         .join('\n');
@@ -178,7 +195,9 @@ function getTemplate({
  * @returns 返回加载的模式
  */
 function checkCreateMode(): OptionType {
-  if (isJs()) {
+  const isJSDoc = isJs();
+  print(`当前是否为 js 文档 : ${isJSDoc}`);
+  if (isJSDoc) {
     return checkJsMode();
   } else {
     return checkMdMode();
@@ -186,7 +205,6 @@ function checkCreateMode(): OptionType {
 }
 
 /**
- *
  * @returns js 规则
  */
 function checkJsMode(): OptionType {
@@ -229,7 +247,7 @@ function checkMdMode(): OptionType {
 }
 
 /**
- *
+ * ## 对比数组剩余可用字段长度
  * @param arr 校验数组
  * @param pathStr 当前文档的路径
  * @returns 返回检验出剩余最小长度
@@ -237,12 +255,11 @@ function checkMdMode(): OptionType {
 function processingArray(arr: string[], pathStr: string): number {
   return arr.reduce((previousValue, currentValue) => {
     const rulesAfterOrganization = currentValue
-      .split(sep)
+      .split(path.sep)
       .join('/')
       .replace(/[*]+/g, '.*');
     const rulerReg = new RegExp(rulesAfterOrganization + '(.*)$');
     const matchResponse = pathStr.match(rulerReg);
-
     // 未靶中
     if (matchResponse === null) {
       return previousValue;
@@ -251,4 +268,19 @@ function processingArray(arr: string[], pathStr: string): number {
       return Math.min(previousValue, matchResponse[1]?.length || Infinity);
     }
   }, Infinity);
+}
+
+/**
+ *  获取版本号
+ * @returns 获取到的版本号
+ */
+function getVersion(): false | string {
+  const packageJson = getPackageJsonSync(currentDocument?.fileName);
+  console.log(packageJson);
+  if (isNull(packageJson)) {
+    return false;
+  }
+  const packageJsonContent = packageJson.content;
+  const version = packageJsonContent.version || false;
+  return version;
 }

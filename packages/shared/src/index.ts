@@ -1,11 +1,9 @@
-import { print } from './print';
-
 export {
+  showErrorMessage,
   showInformationMessage,
   showWarningMessage,
-  showErrorMessage,
 } from './showMessage';
 
-export { print };
+export { print, setOutPutChannel, printError, printWarn } from './print';
 
 export { registerCommand } from './registerCommand';

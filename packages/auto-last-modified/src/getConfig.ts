@@ -10,7 +10,7 @@ const checkDataFormatArr: ['YYYY', 'MM', 'DD'] = ['YYYY', 'MM', 'DD'],
 
 Object.freeze(emptyArr);
 
-export { emptyArr, defaultDatFormat };
+export { defaultDatFormat, emptyArr };
 
 /**
  *
@@ -30,12 +30,17 @@ export function getConfig(): vscode.WorkspaceConfiguration {
 }
 /**
  *
- * @param name 获取的键
+ * @param key 获取的键
  * @param defaultValue 默认值
  * @returns 返回获取的值
  */
-function _get<T>(name: string, defaultValue: T) {
-  return getConfig().get<T>(name, defaultValue) || defaultValue;
+function _get<T>(
+  /** 获取的键 */
+  key: string,
+  /** 默认值 */
+  defaultValue: T,
+) {
+  return getConfig().get<T>(key, defaultValue) || defaultValue;
 }
 
 /**
@@ -57,6 +62,15 @@ export const authorEmail = () => _get<string>('authorEmail', '');
 export const autoInsert = () => _get<boolean>('autoInsertOnNewFile', true);
 
 /**
+ * ## 允许空文件保存时自动插入空文档
+ * @returns 当前是否允许空文件保存时触发插入
+ */
+export const allowInsertOnEmptyFileSave = () =>
+  _get<boolean>('allowInsertOnEmptyFileSave', false);
+
+export const forciblyInsert = () => _get<boolean>('forciblyInsert', false);
+
+/**
  * ## 用户设定的日期格式
  * @returns 用户设定的日期格式
  */
@@ -70,14 +84,12 @@ export const lastModifiedTag = () =>
   _get<string>('lastModifiedTag', 'lastModified');
 
 /**
- *
  * @returns 获取到的 markdown 类型文件的默认构建类型
  */
 export const mdxHeaderType = () =>
   _get<'page' | 'blog'>('mdxHeaderType', 'page');
 
 /**
- *
  * @returns 使用 js/ts/jsx/tsx 的普通模式路径
  */
 export const useJsPlainStyle = () =>
@@ -90,20 +102,16 @@ export const useJsPlainStyle = () =>
 export const usePackageDocumentationStyle = () =>
   _get<string[]>('usePackageDocumentationStyle', emptyArr);
 /**
- *
  * @returns 使用 md/mdx 的 doc 模式
  */
 export const useMdDocStyle = () => _get<string[]>('useMdDocStyle', emptyArr);
 
 /**
- *
  * @returns 使用 md/mdx 的 blog 模式
  */
 export const useMdBlogStyle = () => _get<string[]>('useMdBlogStyle', emptyArr);
 
-/**
- * 配置值
- */
+/**  配置值  */
 export const vsCodeConfig = {
   /** 获取用户的用户名 */
   authorName,
@@ -111,6 +119,10 @@ export const vsCodeConfig = {
   authorEmail,
   /** 是否自动插入空文档 */
   autoInsert,
+  /** 允许空文件保存时触发插入 */
+  allowInsertOnEmptyFileSave,
+  /** 是否允许强制插入 */
+  forciblyInsert,
   /** 当前配置日期格式 */
   dateFormat,
   /** 格式化后的当前日期 */
@@ -123,8 +135,10 @@ export const vsCodeConfig = {
   useJsPlainStyle,
   /** 使用 js/ts/jsx/tsx 的包文档模式路径  */
   usePackageDocumentationStyle,
-  /**  */
+  /** 使用 markdown/mdx 的 doc 风格 */
   useMdDocStyle,
+  /** 使用 markdown/mdx 的 blog 风格 */
+  useMdBlogStyle,
 };
 
 /**

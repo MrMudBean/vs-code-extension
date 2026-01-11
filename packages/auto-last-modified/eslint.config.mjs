@@ -137,7 +137,7 @@ export default [
         'error',
         {
           // 配置允许的标签
-          definedTags: ['packageDocumentation'],
+          definedTags: ['packageDocumentation', 'lastModified'],
         },
       ],
       'jsdoc/check-types': 'error',
@@ -164,16 +164,6 @@ export default [
           },
         },
       ],
-    },
-    settings: {
-      jsdoc: {
-        tagNamePreference: {
-          Description: '用于文件头的自定义文件作用的描述',
-          CreateDate: '文件构建（声明注释）时间',
-          FileName: '文件名称',
-          ProjectName: '项目名称',
-        },
-      },
     },
   },
 
