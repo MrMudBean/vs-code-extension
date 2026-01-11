@@ -138,12 +138,12 @@
         "autoLastModified.allowInsertOnEmptyFileSave": {
           "type": "boolean",
           "default": false,
-          "description": "%configuration.allowInsertOnEmptyFileSave%"
+          "markdownDescription": "%configuration.allowInsertOnEmptyFileSave%"
         },
         "autoLastModified.forciblyInsert": {
           "type": "boolean",
           "default": false,
-          "description": "%configuration.forciblyInsert%"
+          "markdownDescription": "%configuration.forciblyInsert%"
         },
         "autoLastModified.dateFormat": {
           "type": "string",

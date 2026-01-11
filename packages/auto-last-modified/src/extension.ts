@@ -76,6 +76,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // 监听“即将保存”事件
   const onWillSave = vscode.workspace.onWillSaveTextDocument(event => {
+    const reason = event.reason;
+    if (reason == 3) {
+      // 失焦保存时不触发该事件
+      return;
+    }
+    console.log(event);
+
     setCurrentDocument(event.document);
     checkCurrentDocumentIsEmpty(); // 重要：在保存时更新状态
     if (currentDocumentIsEmpty) {
