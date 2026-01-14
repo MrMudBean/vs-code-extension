@@ -1,40 +1,10 @@
 {
-  "name": "auto-last-modified",
-  "publisher": "MrMudBean",
-  "displayName": "%plugin.displayName%",
-  "description": "%plugin.description%",
-  "type": "commonjs",
-  "version": "0.3.0",
-  "galleryBanner": {
-    "color": "#00af8e",
-    "theme": "dark"
-  },
-  "icon": "images/logo.png",
-  "author": {
-    "name": "Mr.MudBean",
-    "email": "Mr.MudBean@outlook.com"
-  },
   "badges": [
     {
       "url": "https://img.shields.io/github/license/MrMudBean/vs-code-extension?style=flat-square",
       "href": "https://github.com/MrMudBean/vs-code-extension/blob/main/packages/auto-last-modified/LICENSE",
       "description": "LICENSE"
     }
-  ],
-  "pricing": "Free",
-  "preview": false,
-  "license": "MIT",
-  "engines": {
-    "vscode": "^1.90.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "keywords": [
-    "auto last modified",
-    "auto file header comment",
-    "自动更新最后编辑日期",
-    "自动文件头"
   ],
   "activationEvents": [
     "onLanguage:javascript",
@@ -45,7 +15,6 @@
     "onLanguage:markdown",
     "onStartupFinished"
   ],
-  "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
@@ -200,10 +169,11 @@
       }
     }
   },
+  "main": "./dist/extension.js",
   "scripts": {
     "diff": "jja pkg --diff 淘宝",
     "vjj": "vjj ---no-diff",
-    "push": "gvv",
+    "push": "jja rm *.vsix &&  gvv",
     "vscode:prepublish": "pnpm run package",
     "compile": "pnpm run check-types && pnpm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
@@ -219,6 +189,36 @@
     "pub": "vsce publish",
     "test": "vscode-test"
   },
+  "name": "auto-last-modified",
+  "publisher": "MrMudBean",
+  "displayName": "%plugin.displayName%",
+  "description": "%plugin.description%",
+  "type": "commonjs",
+  "version": "0.3.1",
+  "galleryBanner": {
+    "color": "#00af8e",
+    "theme": "dark"
+  },
+  "icon": "images/logo.png",
+  "author": {
+    "name": "Mr.MudBean",
+    "email": "Mr.MudBean@outlook.com"
+  },
+  "pricing": "Free",
+  "preview": false,
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "auto last modified",
+    "auto file header comment",
+    "自动更新最后编辑日期",
+    "自动文件头"
+  ],
   "overrides": {
     "zza": "workspace:zza"
   },

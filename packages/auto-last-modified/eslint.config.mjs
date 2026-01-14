@@ -137,7 +137,7 @@ export default [
         'error',
         {
           // 配置允许的标签
-          definedTags: ['packageDocumentation', 'lastModified'],
+          definedTags: ['packageDocumentation', 'lastModified', 'date'],
         },
       ],
       'jsdoc/check-types': 'error',

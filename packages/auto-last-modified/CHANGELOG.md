@@ -1,12 +1,16 @@
 # Change Log / 更改记录
 
-<!-- 当当当 -->
-
-All notable changes to the "auto-last-modified" extension will be documented in this file.
+All notable changes to the "auto-last-modified" extension will be documented in this file. （All English text should use Bing Translate）
 
 所有对 "auto-last-modified" 扩展的显著更改都会记录在此文件中。
 
-## 0.3.0 (1 月 10 日 2025 年)
+## 0.3.1 (2026-1-13)
+
+- Due to shared functions, the auto-header generation feature is triggered when saving. When switching windows in the editor settings, the headers added to the original page are accidentally added to the newly switched or newly opened page, which to some extent affects the user experience.
+
+- 由于共用函数，导致在保存时触发自动生成头部的功能在编辑器设置切换窗口保存时，为原页面添加的头部被意外的添加到了新切换/新打开的页面，在一定程度上影响了使用体验
+
+## 0.3.0 (2026-1-10)
 
 - Added configuration option `Allow Insert On Empty File Save`, which allows you to configure whether to insert a file header when saving an empty file. This option is disabled by default and needs to be enabled manually if required.
 - Added configuration option `Forcibly Insert`, Whether to enable the right-click function key to forcibly insert the file header command. This option is disabled by default and needs to be enabled manually if required.
@@ -18,13 +22,13 @@ All notable changes to the "auto-last-modified" extension will be documented in 
 - 从本版本开始，将自动更新 `@file` 字段为最新的文件名
 - 从本版本开始，将在 ts/js/jsx/tsx 的文件头中插入 `@version` 元标签（如果我能找到 "package.json" 文件的话）
 
-## 0.2.0 (1 月 8 日 2025 年)
+## 0.2.0 (2026-1-8)
 
 - Added configuration options `Use JS Plain Style`, `Use Md Blog Style`, `Use Md Doc Style`, and `Use Package Documentation Style`, which allow files in specific paths to use the specified build header style. This configuration option takes precedence over `Mdx Header Type` (in markdown/mdx documents).
 
 - 添加了配置项 `Use JS Plain Style`、 `Use Md Blog Style`、 `Use Md Doc Style`、`Use Package Documentation Style` ，可以配置特定路径下的文件使用指定的构建头的方式，且该配置项优先级高于 `Mdx Header Type` （在 markdown/mdx 文档中）
 
-## 0.1.1 (1 月 6 日 2025 年)
+## 0.1.1 (2026-1-6)
 
 - Basic mistake, forgot the month 1
 

@@ -21,7 +21,7 @@ export function registerCommand<T extends string>({
   /** 命令名称 */
   name: T;
   /** 该命令对应的回调 */
-  callback: () => void;
+  callback: (...args: any[]) => any;
 }): vscode.Disposable {
   console.log(
     ...colorText(

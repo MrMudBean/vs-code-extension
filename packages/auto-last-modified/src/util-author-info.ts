@@ -1,6 +1,6 @@
 import { runOtherCode } from 'a-node-tools';
 import { extensionContext } from './context';
-import { vsCodeConfig } from './getConfig';
+import { vsCodeConfig } from './get-config';
 
 // 插件全局使用数据键 -- user-info
 const key_userInfo = 'user-info';

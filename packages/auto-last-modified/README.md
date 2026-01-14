@@ -9,13 +9,15 @@
 <!-- 本插件在  https://marketplace.visualstudio.com/items?itemName=MrMudBean.auto-last-modified 可见 -->
 <!-- 官网地址 [microsoft vs code extension api](https://code.visualstudio.com/api/get-started/extension-anatomy) -->
 
+<!--  [github doc](https://docs.github.com/zh/contributing/writing-for-github-docs/using-markdown-and-liquid-in-github-docs) 指南 -->
+
+<!-- [在 github 中使用 markdown](https://github.github.com/gfm/) -->
+
 ## ✨ Features / 功能亮点
 
-:::info
-
-下面出自于阿里千问
-
-:::
+> [!TIP]
+> The following is from Ali Qianwen
+> 下面出自于阿里千问
 
 - ✅ **Auto-update `@lastModified`** field with current date on every save（ In `mdx/md` files, follow the `last_update.date` field of [docusaurus](https://docusaurus.io/zh-CN/docs/) and do not change it. ）
 - ✅ **Auto-insert header** when creating new `.ts`, `.tsx`, `.js`, `.jsx`, or `.mdx`,`.md` files
@@ -95,3 +97,13 @@ After thinking about it, the original setup required me to manually switch the t
 If you need to add a comment header when saving an empty file, you can enable the `autoLastModified.allowInsertOnEmptyFileSave` setting.
 
 如果有在空文件保存时添加注释头的需求，可以开启 `autoLastModified.allowInsertOnEmptyFileSave` 配置。
+
+## Submit Issues / 问题提交
+
+- By [github issues](https://github.com/MrMudBean/vs-code-extension/issues)
+- By [Email](mailto:Mr.MudBean@outlook.com?subject=Some%20Of%20Auto%20Last%20Modified%20vscode%20extension&body=Oops!%0A%0A%20%20%20%20%20%20%20The%20sky%20is%20falling!%20I've%20discovered%20a%20critical%20issue%20in%20your%20'Auto%20Last%20Modified'%20extension.)
+
+---
+
+- 使用 [github 提交问题](https://github.com/MrMudBean/vs-code-extension/issues)
+- 通过 [Email](mailto:Mr.MudBean@qq.com?subject=%E5%85%B3%E4%BA%8E%20Auto%20Last%20Modified%20%E7%9A%84%E9%97%AE%E9%A2%98&body=%20%20%E6%88%91%E5%8F%91%E7%8E%B0)
